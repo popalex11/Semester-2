@@ -1,0 +1,3 @@
+this is file3.txt.
+it has multiple lines.
+end of file3.txt.
