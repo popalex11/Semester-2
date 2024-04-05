@@ -9,3 +9,7 @@ class GraphEdge:
             return f"{self.start_vertex} --({self.weight})--> {self.end_vertex}"
         else:
             return f"{self.start_vertex} --> {self.end_vertex}"
+
+    def __repr__(self):
+        return str(self)
+    

@@ -9,6 +9,7 @@ def main():
     print("\nAdding vertices 0, 1, 2, 3")
     for i in range(4):
         graph.add_vertex(i)
+    graph.weighted = True
     print(graph)
 
     print("\nAdding edges: (0, 1), (1, 2), (2, 0), (2, 3)")
@@ -44,9 +45,11 @@ def main():
     graph.set_weight(1, 2, 5.5)
     print(graph)
 
+    graph.empty_graph()
+
     # Reading graph from file 'graph_data.txt'
     print("\nReading graph from file 'graph_data.txt'")
-    graph.create_from_file("main_program/graph_data.txt")
+    graph.create_from_file("graph_data.txt")
     print(graph)
 
 if __name__ == "__main__":
