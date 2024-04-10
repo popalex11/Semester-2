@@ -19,6 +19,15 @@ def main():
     graph.add_edge(2, 3, 4.7)
     print(graph)
 
+    start_vertex = (0,1)
+    print("Going through the graph using DFS starting from vertex", start_vertex)
+    iterator = graph.iter_vertex(start_vertex)
+    iterator.first()
+    while iterator.valid():
+        print(iterator.get_current())
+        iterator.next()
+
+
     print("\nRemoving edge (2, 0)")
     graph.remove_edge(2, 0)
     print(graph)

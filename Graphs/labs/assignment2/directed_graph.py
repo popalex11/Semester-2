@@ -1,6 +1,7 @@
 import random
 import math
 from graph_edge import GraphEdge
+from graph_iterator import GraphIterator
 
 class DirectedGraph:
     def __init__(self, directed = True, weighted = False):
@@ -86,7 +87,6 @@ class DirectedGraph:
                 weight = random.uniform(weights_range[0], weights_range[1])
             self.add_edge(start_vertex, end_vertex, math.floor(weight*10)/10
 )
-
         self.num_vertices = n
         self.num_edges = m
 
@@ -140,6 +140,9 @@ class DirectedGraph:
                     outbound.append(edge[1])
         return outbound
     
+    def outbound_neighbors(self, vertex):
+        return self.vertices[vertex]
+
     def inbound_edges(self, vertex):
         # Time complexity: O(V) where V is the number of vertices
         if vertex not in self.vertices:
@@ -186,6 +189,9 @@ class DirectedGraph:
         self.num_vertices = 0
         self.num_edges = 0
 
+    def iter_vertex(self, start_vertex):
+        return GraphIterator(self, start_vertex)
+    
     def __str__(self):
         result = "Directed: " + str(self.directed) + "\n"
         result += "Weighted: " + str(self.weighted) + "\n"
