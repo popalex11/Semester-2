@@ -1,0 +1,3 @@
+/home/aponmywrist/Desktop/UNI AI/Semester-2/data structures/a2/cmake-build-debug/CMakeFiles/a2.dir
+/home/aponmywrist/Desktop/UNI AI/Semester-2/data structures/a2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/aponmywrist/Desktop/UNI AI/Semester-2/data structures/a2/cmake-build-debug/CMakeFiles/rebuild_cache.dir

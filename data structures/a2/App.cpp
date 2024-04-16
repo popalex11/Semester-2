@@ -1,8 +1,12 @@
 #include <iostream>
 #include "MultiMap.h"
 #include "ExtendedTest.h"
+#include "ExtendedTest.cpp"
 #include "ShortTest.h"
 #include "MultiMapIterator.h"
+#include "MultiMap.cpp"
+#include "MultiMapIterator.cpp"
+#include "ShortTest.cpp"
 
 using namespace std;
 
