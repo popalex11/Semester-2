@@ -2,32 +2,31 @@ from directed_graph import Graph
 from metro import Metro
 
 def print_menu(graph):
-    print("Graph type: " + ("Directed" if graph.is_reversible() else "Undirected") +
-          ", " + ("Weighted" if graph.is_weighted() else "Unweighted"))
     print("1. Add vertex")
     print("2. Add edge")
     print("3. Remove vertex")
     print("4. Remove edge")
     print("5. Create random graph")
     print("6. Get degree of vertex")
-    print("7. Check if there is an edge between two vertices")
+    print("7. Check if the edge exists")
     print("8. Copy graph")
-    print("9. Display graph")
-    print("10. Depth-first search")
-    print("11. Get path length")
+    print("9. Show the graph")
+    print("10. DFS(Depth First Search)")
+    print("11. Path length")
     print("0. Exit")
+    print("The graph is " + ("Directed" if graph.is_reversible() else "Undirected") +", " + ("Weighted" if graph.is_weighted() else "Unweighted"))
 
 def main():
     graph = Graph.create_from_file("graph_data.txt")
     while True:
         try:
             print_menu(graph)
-            command = input("Enter command: ")
+            command = input("Option: ")
             if command == "1":
                 graph.add_vertex()
                 print(graph)
                 print()
-                print("Vertex added.")
+                print("Vertex successfully added.")
             elif command == "2":
                 vertex1 = int(input("Enter first vertex: "))
                 vertex2 = int(input("Enter second vertex: "))
@@ -38,36 +37,39 @@ def main():
                     graph.add_edge(vertex1, vertex2)
                 print(graph)
                 print()
-                print("Edge added.")
+                print("Edge {vertex1} -> {vertex2} successfully added.")
             elif command == "3":
                 vertex = int(input("Enter vertex to remove: "))
                 graph.remove_vertex(vertex)
                 print(graph)
                 print()
-                print(f"Vertex {vertex} removed.")
+                print(f"Vertex {vertex} successfully removed.")
             elif command == "4":
                 vertex1 = int(input("Enter first vertex: "))
                 vertex2 = int(input("Enter second vertex: "))
                 graph.remove_edge(vertex1, vertex2)
                 print(graph)
                 print()
-                print("Edge removed.")
+                print("Edge {vertex1} -> {vertex2} successfully removed.")
             elif command == "5":
                 n = int(input("Enter number of vertices: "))
                 graph.create_random(n)
                 print(graph)
                 print()
-                print("Random graph created.")
+                print("Random graph successfully created.")
             elif command == "6":
                 vertex = int(input("Enter vertex: "))
                 print(f"Degree of vertex {vertex}: {graph.deg(vertex)}")
             elif command == "7":
                 vertex1 = int(input("Enter first vertex: "))
                 vertex2 = int(input("Enter second vertex: "))
-                print("Edge exists: " + str(graph.is_edge(vertex1, vertex2)))
+                if str(graph.is_edge(vertex1, vertex2)) == "True":
+                    print("Edge does exist.")
+                else:
+                    print("Edge does not exist.")
             elif command == "8":
                 copy = graph.copy_graph()
-                print("Graph copied.")
+                print("Graph successfully copied.")
             elif command == "9":
                 print(graph)
             elif command == "10":

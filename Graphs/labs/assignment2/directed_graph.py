@@ -6,7 +6,7 @@ class Graph:
     def __init__(self, reversible: bool, weighted: bool = False):
         self.__nodes = 0
         self.__reversible = reversible
-        self.__weighted = weighted  # Indicates if the graph is weighted
+        self.__weighted = weighted  
         self.__graph = []
 
     def get_graph(self):
@@ -18,7 +18,17 @@ class Graph:
             row.append(0)  # Use 0 to indicate no connection
         self.__graph.append([0] * self.__nodes)
 
+    def is_tuple(self, vertex):
+        return isinstance(vertex, tuple)
+    
+
     def add_edge(self, vertex1, vertex2, weight=1):
+        '''
+        I want to first verify if vertex1 and vertex2 ar tuples or integers and then add the edge in each case
+        '''
+        if self.is_tuple(vertex1) and self.is_tuple(vertex2):
+            vertex1, vertex2 = int(vertex1[0]), int(vertex2[0])
+
         if vertex1 < 0 or vertex2 < 0 or vertex1 >= self.__nodes or vertex2 >= self.__nodes:
             raise ValueError("One or both of the vertices are not in the graph")
         if not self.__weighted:
