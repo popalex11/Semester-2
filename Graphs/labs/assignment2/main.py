@@ -1,65 +1,107 @@
-from directed_graph import DirectedGraph
+from directed_graph import Graph
+from metro import Metro
+
+def print_menu(graph):
+    print("Graph type: " + ("Directed" if graph.is_reversible() else "Undirected") +
+          ", " + ("Weighted" if graph.is_weighted() else "Unweighted"))
+    print("1. Add vertex")
+    print("2. Add edge")
+    print("3. Remove vertex")
+    print("4. Remove edge")
+    print("5. Create random graph")
+    print("6. Get degree of vertex")
+    print("7. Check if there is an edge between two vertices")
+    print("8. Copy graph")
+    print("9. Display graph")
+    print("10. Depth-first search")
+    print("11. Get path length")
+    print("0. Exit")
 
 def main():
-    # Example usage of DirectedGraph class and graph examples
-    graph = DirectedGraph()
-    print("Initial graph:")
-    print(graph)
+    graph = Graph.create_from_file("graph_data.txt")
+    while True:
+        try:
+            print_menu(graph)
+            command = input("Enter command: ")
+            if command == "1":
+                graph.add_vertex()
+                print(graph)
+                print()
+                print("Vertex added.")
+            elif command == "2":
+                vertex1 = int(input("Enter first vertex: "))
+                vertex2 = int(input("Enter second vertex: "))
+                if graph.is_weighted():
+                    weight = float(input("Enter weight: "))
+                    graph.add_edge(vertex1, vertex2, weight)
+                else:
+                    graph.add_edge(vertex1, vertex2)
+                print(graph)
+                print()
+                print("Edge added.")
+            elif command == "3":
+                vertex = int(input("Enter vertex to remove: "))
+                graph.remove_vertex(vertex)
+                print(graph)
+                print()
+                print(f"Vertex {vertex} removed.")
+            elif command == "4":
+                vertex1 = int(input("Enter first vertex: "))
+                vertex2 = int(input("Enter second vertex: "))
+                graph.remove_edge(vertex1, vertex2)
+                print(graph)
+                print()
+                print("Edge removed.")
+            elif command == "5":
+                n = int(input("Enter number of vertices: "))
+                graph.create_random(n)
+                print(graph)
+                print()
+                print("Random graph created.")
+            elif command == "6":
+                vertex = int(input("Enter vertex: "))
+                print(f"Degree of vertex {vertex}: {graph.deg(vertex)}")
+            elif command == "7":
+                vertex1 = int(input("Enter first vertex: "))
+                vertex2 = int(input("Enter second vertex: "))
+                print("Edge exists: " + str(graph.is_edge(vertex1, vertex2)))
+            elif command == "8":
+                copy = graph.copy_graph()
+                print("Graph copied.")
+            elif command == "9":
+                print(graph)
+            elif command == "10":
+                start_vertex = int(input("Enter start vertex: "))
+                iterator = graph.iter_vertex(start_vertex)
+                iterator.first()
+                while iterator.valid():
+                    print(iterator.get_current())
+                    iterator.next()
+            elif command == "11":
+                start_vertex = int(input("Enter start vertex: "))
+                iterator = graph.iter_vertex(start_vertex)
+                iterator.first()
+                while iterator.valid():
+                    print(iterator.get_path_length())
+                    iterator.next()
+            elif command == "0":
+                break
+            else:
+                print("Invalid command")
+        except Exception as e:
+            print(e)
+            print()
 
-    print("\nAdding vertices 0, 1, 2, 3")
-    for i in range(4):
-        graph.add_vertex(i)
-    graph.weighted = True
-    print(graph)
-
-    print("\nAdding edges: (0, 1), (1, 2), (2, 0), (2, 3)")
-    graph.add_edge(0, 1, 3.5)
-    graph.add_edge(1, 2, 2.0)
-    graph.add_edge(2, 0, 1.2)
-    graph.add_edge(2, 3, 4.7)
-    print(graph)
-
-    start_vertex = (0,1)
-    print("Going through the graph using DFS starting from vertex", start_vertex)
-    iterator = graph.iter_vertex(start_vertex)
-    iterator.first()
-    while iterator.valid():
-        print(iterator.get_current())
-        iterator.next()
-
-
-    print("\nRemoving edge (2, 0)")
-    graph.remove_edge(2, 0)
-    print(graph)
-
-    print("\nRemoving vertex 0")
-    graph.remove_vertex(0)
-    print(graph)
-
-    print("\nOutbound edges of vertex 2:")
-    print(graph.outbound_edges(2))
-
-    print("\nInbound edges of vertex 2:")
-    print(graph.inbound_edges(2))
-
-    print("\nCreating random graph with 5 vertices and 8 edges (weighted)")
-    graph.create_random(5, 8, [1, 10])
-    print(graph)
-
-    print("\nRandomizing weights with range [1, 5]")
-    graph.random_weights([1, 5])
-    print(graph)
-
-    print("\nSetting weight of edge (1, 2) to 5.5")
-    graph.set_weight(1, 2, 5.5)
-    print(graph)
-
-    graph.empty_graph()
-
-    # Reading graph from file 'graph_data.txt'
-    print("\nReading graph from file 'graph_data.txt'")
-    graph.create_from_file("graph_data.txt")
-    print(graph)
+def metro_menu():
+    metro = Metro.read_metro("asgn3input.txt")
+    while True:
+        try:
+            line = input("Line: ")
+            station = input("Station: ")
+            d = metro.bellman_ford((line, station))
+            print(f'Distances:\n{d}\n')
+        except Exception as e:
+            print(f'An error occurred:{e}')
 
 if __name__ == "__main__":
-    main()
+    metro_menu()
