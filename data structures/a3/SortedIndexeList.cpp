@@ -60,15 +60,13 @@ TComp SortedIndexedList::remove(int pos) {
 int SortedIndexedList::search(TComp e) const {
 	int current = head;
     int pos = 0;
-	cout<<current<<endl;
-	cout<<next[current]<<endl;
-    while (current != -1 && relation(elements[current], e)) {
+    if(current == elements[current]) {
+        return pos;
+    }
+    while (current != -1 && next[current]!=-1 && relation(elements[current], e)) {
         ++pos;
         current = next[current];
     }
-	cout<<current<<endl;
-	cout<<next[current]<<endl;
-	cout<<pos<<endl;
     if (current != -1 && elements[current] == e) {
         return pos;
     }

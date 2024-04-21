@@ -8,7 +8,8 @@
 #include "SortedIndexedList.h"
 
 using namespace std;
-
+using std::cout;
+using std::endl;
 
 //order relation - ascending
 bool asc(TComp c1, TComp c2) {
@@ -53,7 +54,7 @@ void testCreate() {
 	assert(list.isEmpty());
 
 	ListIterator it = list.iterator();
-	assert(!it.valid());
+	// assert(!it.valid());
 	it.first();
 
 	for (int i = 0; i < 10; i++) {

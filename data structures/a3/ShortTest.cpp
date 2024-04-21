@@ -1,5 +1,5 @@
 #include <assert.h>
-
+#include <iostream>
 #include "ListIterator.h"
 #include "SortedIndexedList.h"
 

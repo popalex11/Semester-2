@@ -7,6 +7,7 @@ using namespace std;
 
 ListIterator::ListIterator(const SortedIndexedList& list) : list(list) {
 	//TODO - Implementation
+	
 }
 
 void ListIterator::first(){
@@ -20,7 +21,9 @@ void ListIterator::next(){
 }
 
 bool ListIterator::valid() const{
-	return current != -1;
+	if (current != -1) {
+		return true;
+	}
 	return false;
 }
 
