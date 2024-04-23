@@ -40,7 +40,6 @@ void MultiMap::addNewKey(TKey k) {
 void MultiMap::addValueToKey(TKey k, TValue v) {
     KeyNode *currentNodeKey = this->head;
 
-    // Find the key in the list of keys
     while (currentNodeKey != nullptr && currentNodeKey->info != k) {
         currentNodeKey = currentNodeKey->next;
     }
@@ -49,23 +48,18 @@ void MultiMap::addValueToKey(TKey k, TValue v) {
     nodeVal->info = v;
     nodeVal->next = nullptr;
 
-    // If the key is not found, create a new key node
-    if (currentNodeKey == nullptr) {
-        addNewKey(k);
-        currentNodeKey = this->tail;
-    }
-
-    // Check if the key already has values
     if (currentNodeKey->v == nullptr) {
         currentNodeKey->v = nodeVal;
-    } else {
-        // Traverse to the end of the values for the key and append nodeVal
-        ValueNode *currentNodeValue = currentNodeKey->v;
-        while (currentNodeValue->next != nullptr) {
-            currentNodeValue = currentNodeValue->next;
-        }
-        currentNodeValue->next = nodeVal;
+        return;
     }
+
+    ValueNode *currentNodeValue = currentNodeKey->v;
+
+    while (currentNodeValue->next != nullptr) {
+        currentNodeValue = currentNodeValue->next;
+    }
+
+    currentNodeValue->next = nodeVal;
 }
 
 void MultiMap::freeValues(ValueNode *head) {
@@ -99,57 +93,46 @@ void MultiMap::add(TKey c, TValue v) {
 
 
 bool MultiMap::remove(TKey c, TValue v) {
-    KeyNode *currentKey = head;
-    KeyNode *previousKey = nullptr;
-    ValueNode *currentValue = nullptr;
-    ValueNode *previousValue = nullptr;
-
-    // Find the key node corresponding to key 'c'
-    while (currentKey != nullptr && currentKey->info != c) {
-        previousKey = currentKey;
-        currentKey = currentKey->next;
+    auto currentElem = head;
+    KeyNode *previous = nullptr;
+    ValueNode *previous_a = nullptr;
+    while (currentElem != nullptr and currentElem->info != c) {
+        previous = currentElem;
+        currentElem = currentElem->next;
     }
-
-    // If key not found
-    if (currentKey == nullptr) {
+    if (currentElem == nullptr) { // if key not found
         return false;
     }
 
-    // Find the value node corresponding to value 'v' in the key node
-    currentValue = currentKey->v;
-    while (currentValue != nullptr && currentValue->info != v) {
-        previousValue = currentValue;
-        currentValue = currentValue->next;
+    while (currentElem->v != nullptr and currentElem->v->info != v) {
+        previous_a = currentElem->v;
+        currentElem->v = currentElem->v->next;
     }
 
-    // If value node not found
-    if (currentValue == nullptr) {
-        return false;
-    }
-
-    // If value found, remove it
-    if (previousValue == nullptr) {
-        currentKey->v = currentValue->next;
+    if (previous_a != nullptr) { // if value found
+        if(currentElem->v != nullptr)
+            previous_a->next = currentElem->v->next;
+        else
+            previous_a->next = nullptr;
     } else {
-        previousValue->next = currentValue->next;
+        if(currentElem->v != nullptr)
+            currentElem->v = currentElem->v->next;
+        else
+            currentElem->v = nullptr;
+        //currentElem->v = currentElem->v->next;
     }
 
-    delete currentValue;
-    length--;
-
-    // If the key node has no more values, remove the key node
-    if (currentKey->v == nullptr) {
-        if (previousKey != nullptr) {
-            previousKey->next = currentKey->next;
+    if (currentElem->v == nullptr) {
+        if (previous != nullptr) {
+            previous->next = currentElem->next;
         } else {
-            head = currentKey->next;
+            this->head = currentElem->next;
         }
-        delete currentKey;
     }
 
+    this->length--;
     return true;
 }
-
 
 
 vector<TValue> MultiMap::search(TKey c) const {
