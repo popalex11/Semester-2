@@ -1,40 +1,22 @@
 #!/bin/bash
 
-# Define the log file
 LOG_FILE="ftp_log.txt"
 
-# Function to get timestamp
-get_timestamp() {
-    date +"%Y-%m-%d %T"
+# Function to intercept and log ftp commands
+function intercept_ftp_command {
+    local cmd="$1"
+    local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    local server=$(netstat -ant | awk '$6 == "ESTABLISHED" && $4 ~ /:21$/ {print $5}' | awk -F ':' '{print $1}' | head -n 1)
+    
+    # Log the user, timestamp, and server
+    echo "User: $(whoami), Time: $timestamp, Server: $server, Command: $cmd" >> "$LOG_FILE"
 }
 
-# Function to log ftp attempts
-log_ftp_attempt() {
-    local timestamp=$(get_timestamp)
-    local user="$USER"
-    local server="$SSH_CONNECTION"
+# Alias setup to intercept the ftp command
+alias ftp="intercept_ftp_command"
 
-    # Extract only the IP address from the SSH_CONNECTION variable
-    local ip_address=$(echo "$server" | cut -d " " -f 1)
+# Continuously monitor for user commands
+while true; do
+    sleep 1 # Adjust sleep duration as needed
+done
 
-    echo "[$timestamp] User $user attempted to connect to FTP server $ip_address" >> "$LOG_FILE"
-}
-
-# Main function
-main() {
-    local ftp_executed=false
-
-    # Monitor command usage using 'trap'
-    trap 'if [ "$ftp_executed" = false ]; then log_ftp_attempt; ftp_executed=true; fi' DEBUG
-
-    # Wait for the ftp command to finish
-    echo "Waiting for FTP session to finish..."
-    wait
-
-    # Exit the monitoring loop
-    echo "FTP session terminated. Exiting..."
-    exit 0
-}
-
-# Execute the main function
-main
