@@ -1,3 +1,10 @@
 FTP stands for File Transfer Protocol. It's a standard network protocol used for the transfer of files between a client and a server on a computer network. FTP operates on a client-server model where the client initiates a connection to the server to perform file transfers.
 
+source ~/.bashrc   # For bash users
 
+unset PROMPT_COMMAND
+nano ~/.bashrc
+# source /shared/path/command_logger.sh
+
+
+This script sets up a logging mechanism to record every command that starts with ftp, including the timestamp, username, and hostname, to a specified log file. It achieves this by defining a function that is called before each command prompt in the user's shell session.

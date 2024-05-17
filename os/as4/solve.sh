@@ -1,22 +1,22 @@
 #!/bin/bash
 
-LOG_FILE="ftp_log.txt"
+log_file="ftp_log.txt"
+hostname=$(hostname)
 
-# Function to intercept and log ftp commands
-function intercept_ftp_command {
-    local cmd="$1"
-    local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    local server=$(netstat -ant | awk '$6 == "ESTABLISHED" && $4 ~ /:21$/ {print $5}' | awk -F ':' '{print $1}' | head -n 1)
-    
-    # Log the user, timestamp, and server
-    echo "User: $(whoami), Time: $timestamp, Server: $server, Command: $cmd" >> "$LOG_FILE"
+# Ensure the log file exists
+touch "$log_file"
+
+log_command() {
+    user=$(whoami)
+    time=$(date "+%Y-%m-%d %H:%M:%S")
+    command=$(history 1 | sed 's/^[ ]*[0-9]\+[ ]*//')
+
+    # Check if the command starts with "ftp"
+    if [[ $command == ftp* ]]; then
+        echo "[$time] Server: $hostname User: $user Command: $command" >> "$log_file"
+    fi
 }
 
-# Alias setup to intercept the ftp command
-alias ftp="intercept_ftp_command"
-
-# Continuously monitor for user commands
-while true; do
-    sleep 1 # Adjust sleep duration as needed
-done
+# Set the PROMPT_COMMAND to log each command
+export PROMPT_COMMAND=log_command
 
