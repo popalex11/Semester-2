@@ -22,20 +22,22 @@ class Graph:
         return isinstance(vertex, tuple)
     
 
-    def add_edge(self, vertex1, vertex2, weight=1):
+    def add_edge(self, initial_vertex, terminal_vertex, weight=1):
         '''
         I want to first verify if vertex1 and vertex2 ar tuples or integers and then add the edge in each case
         '''
-        if self.is_tuple(vertex1) and self.is_tuple(vertex2):
-            vertex1, vertex2 = int(vertex1[0]), int(vertex2[0])
-
-        if vertex1 < 0 or vertex2 < 0 or vertex1 >= self.__nodes or vertex2 >= self.__nodes:
-            raise ValueError("One or both of the vertices are not in the graph")
-        if not self.__weighted:
-            weight = 1  # Ensures compatibility with unweighted graphs
-        self.__graph[vertex1][vertex2] = weight
-        if self.__reversible:
-            self.__graph[vertex2][vertex1] = weight
+        # Complexity: O(n+m/n)
+        if initial_vertex == terminal_vertex or initial_vertex not in self.__graph or terminal_vertex not in self._nodes:
+            raise ValueError(f'Invalid vertices {initial_vertex} {terminal_vertex}!')
+        if terminal_vertex in self._nodes[initial_vertex]:
+            raise ValueError(f'Edge {initial_vertex, terminal_vertex} already exists!')
+        self._nodes[initial_vertex].append(terminal_vertex)
+        if not self.__directed:
+            self._nodes[terminal_vertex].append(initial_vertex)
+        if self.__weighted:
+            self._weights[(initial_vertex, terminal_vertex)] = 1
+            if not self.__directed:
+                self._weights[(terminal_vertex, initial_vertex)] = 1
 
     def remove_edge(self, vertex1, vertex2):
         self.__graph[vertex1][vertex2] = 0
