@@ -1,33 +1,34 @@
 import random
-from graph_iterator import GraphIterator
+from copy import deepcopy
+from graph_iterator import Iterator
 
 
 class Graph:
-    def __init__(self, reversible: bool, weighted: bool = False):
-        self.__nodes = 0
-        self.__reversible = reversible
-        self.__weighted = weighted  
-        self.__graph = []
+    def __init__(self, directed=True, weighted=False):
+        # Complexity:Theta(1)
+        self._nodes = {}
+        self.__directed = directed
+        self.__weighted = weighted
+        if weighted:
+            self._weights = {}
 
-    def get_graph(self):
-        return self.__graph
+    def is_directed(self):
+        # Theta(1)
+        return self.__directed
 
-    def add_vertex(self):
-        self.__nodes += 1
-        for row in self.__graph:
-            row.append(0)  # Use 0 to indicate no connection
-        self.__graph.append([0] * self.__nodes)
+    def is_weighted(self):
+        # Theta(1)
+        return self.__weighted
 
-    def is_tuple(self, vertex):
-        return isinstance(vertex, tuple)
-    
+    def add_vertex(self, vertex_id):
+        # Complexity: O(n)
+        if vertex_id in self._nodes:
+            raise ValueError(f'Vertex {vertex_id} already exists!')
+        self._nodes[vertex_id] = []
 
-    def add_edge(self, initial_vertex, terminal_vertex, weight=1):
-        '''
-        I want to first verify if vertex1 and vertex2 ar tuples or integers and then add the edge in each case
-        '''
+    def add_edge(self, initial_vertex, terminal_vertex):
         # Complexity: O(n+m/n)
-        if initial_vertex == terminal_vertex or initial_vertex not in self.__graph or terminal_vertex not in self._nodes:
+        if initial_vertex == terminal_vertex or initial_vertex not in self._nodes or terminal_vertex not in self._nodes:
             raise ValueError(f'Invalid vertices {initial_vertex} {terminal_vertex}!')
         if terminal_vertex in self._nodes[initial_vertex]:
             raise ValueError(f'Edge {initial_vertex, terminal_vertex} already exists!')
@@ -39,104 +40,200 @@ class Graph:
             if not self.__directed:
                 self._weights[(terminal_vertex, initial_vertex)] = 1
 
-    def remove_edge(self, vertex1, vertex2):
-        self.__graph[vertex1][vertex2] = 0
-        if self.__reversible:
-            self.__graph[vertex2][vertex1] = 0
+    def remove_edge(self, initial_vertex, terminal_vertex):
+        # Complexity: O(n+m/n)
+        if (initial_vertex not in self._nodes.keys() or
+                terminal_vertex not in self._nodes.keys() or initial_vertex == terminal_vertex):
+            raise ValueError("Invalid vertices!")
+        if terminal_vertex not in self._nodes[initial_vertex]:
+            raise ValueError("Edge does not exist!")
+        self._nodes[initial_vertex].remove(terminal_vertex)
+        if not self.__directed:
+            self._nodes[terminal_vertex].remove(initial_vertex)
+        if self.__weighted:
+            self._weights.pop((initial_vertex, terminal_vertex))
+            if not self.__directed:
+                self._weights.pop((terminal_vertex, initial_vertex))
 
     def remove_vertex(self, vertex):
-        if vertex < 0 or vertex >= self.__nodes:
-            raise ValueError("The vertex is not in the graph")
-        self.__nodes -= 1
-        self.__graph.pop(vertex)
-        for row in self.__graph:
-            row.pop(vertex)
+        # Complexity: O(n+m)
+        if vertex not in self._nodes.keys():
+            raise ValueError("Vertex does not exist!")
+        self._nodes.pop(vertex)
+        for nodes in self._nodes.values():
+            if vertex in nodes:
+                nodes.remove(vertex)
+        if self.__weighted:
+            for node in self._nodes.keys():
+                if (vertex, node) in self._weights.keys():
+                    self._weights.pop((vertex, node))
+                    if not self.__directed:
+                        self._weights.pop((node, vertex))
 
-    def create_random(self, n, max_weight=10):
-        self.__nodes = n
-        self.__graph = [[0] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(i + 1, n):
-                if random.random() < 0.5:
-                    weight = random.randint(1, max_weight) if self.__weighted else 1
-                    self.add_edge(i, j, weight)
+    def create_random(self, n, m, weight_range=(0, 10)):
+        # Complexity: roughly Theta(n*n+m*(n+m/n))
+        if n < 0:
+            raise ValueError("Number of nodes cannot be negative!")
+        if m < 0:
+            raise ValueError("Number of edges cannot be negative!")
+        if self.__directed and m > n * (n - 1):
+            raise ValueError("Too many edges!")
+        if not self.__directed and m > n * (n - 1) / 2:
+            raise ValueError("Too many edges!")
+        g = Graph(self.__directed, self.__weighted)
+        for i in range(0, n):
+            g.add_vertex(i)
+        while m > 0:
+            try:
+                initial = random.randrange(0, n)
+                terminal = random.randrange(0, n)
+                g.add_edge(initial, terminal)
+                if self.__weighted:
+                    g.set_weight(initial, terminal, random.randrange(weight_range[0], weight_range[1] + 1))
+                m = m - 1
+            finally:
+                continue
+        return g
 
     def get_n(self):
-        return self.__nodes
+        # Complexity:Theta(1)
+        return len(self._nodes.keys())
 
-    def get_edges(self):
-        edges = []
-        for i in range(self.__nodes):
-            for j in range(self.__nodes):
-                if self.__graph[i][j] != 0:
-                    edges.append((i, j, self.__graph[i][j]) if self.__weighted else (i, j))
-        return edges
+    def get_m(self):
+        # Complexity:Theta(n)
+        s = 0
+        for edges in self._nodes.values():
+            s += len(edges)
+        if not self.__directed:
+            s = s // 2
+        return s
 
-    def deg(self, x):
-        return sum(1 for weight in self.__graph[x] if weight != 0)
+    def deg(self, vertex, controller=1):
+        # Complexity: O(n+n*m)
+        if vertex not in self._nodes.keys():
+            raise ValueError("Vertex does not exist!")
+        if not self.__directed:
+            return len(self._nodes[vertex])
+        if controller == 0:
+            return len(self._nodes[vertex]) + len(self.inbound_edges(vertex))
+        if controller == 1 and self.__directed:
+            return len(self._nodes[vertex])
+        if controller == 2 and self.__directed:
+            return len(self.inbound_edges(vertex))
+        raise ValueError("Invalid controller!")
 
-    def is_edge(self, x, y):
-        return self.__graph[x][y] != 0
+    def is_edge(self, initial_vertex, terminal_vertex):
+        # Complexity: O(n+m/n)
+        if initial_vertex not in self._nodes.keys() or terminal_vertex not in self._nodes.keys():
+            raise ValueError("Invalid vertices!")
+        return terminal_vertex in self._nodes[initial_vertex]
 
-    def outbound_edges(self, x):
-        if self.__reversible:
-            return "This function is only available for non-reversible graphs"
-        return [(x, i, self.__graph[x][i]) for i in range(self.__nodes) if self.__graph[x][i] != 0] if self.__weighted \
-            else [i for i in range(self.__nodes) if self.__graph[x][i] != 0]
+    def set_weight(self, initial_vertex, terminal_vertex, new_weight):
+        # O(n+m)
+        if not self.__weighted:
+            raise ValueError("Graph is not weighted!")
+        if not self.is_edge(initial_vertex, terminal_vertex):
+            raise ValueError("Edge does not exist!")
+        self._weights[(initial_vertex, terminal_vertex)] = new_weight
+        if not self.__directed:
+            self._weights[(terminal_vertex, initial_vertex)] = new_weight
 
-    def inbound_edges(self, x):
-        if self.__reversible:
-            return "This function is only available for non-reversible graphs."
-        return [(i, x, self.__graph[i][x]) for i in range(self.__nodes) if self.__graph[i][x] != 0] if self.__weighted \
-            else [i for i in range(self.__nodes) if self.__graph[i][x] != 0]
+    def random_weights(self, weight_range=(1, 5)):
+        if not isinstance(weight_range, tuple):
+            raise ValueError("Weight range must be a tuple!")
+        if not self.__weighted:
+            self.__weighted = True
+            self._weights = {}
+        for node in self._nodes.keys():
+            for terminal in self._nodes[node]:
+                self._weights[(node, terminal)] = random.randrange(weight_range[0], weight_range[1] + 1)
+
+    def outbound_edges(self, vertex):
+        # Complexity: Theta(n)
+        if vertex not in self._nodes.keys():
+            raise ValueError("Vertex does not exist!")
+        return self._nodes[vertex][:]
+
+    def inbound_edges(self, vertex):
+        # Complexity: O(n*m)
+        if vertex not in self._nodes.keys():
+            raise ValueError("Vertex does not exist!")
+        if not self.__directed:
+            return self._nodes[vertex][:]
+        inbound = []
+        for node in self._nodes.keys():
+            if vertex in self._nodes[node]:
+                inbound.append(node)
+        return inbound[:]
+
+    def iter_vertex(self, vertex):
+        if vertex not in self._nodes.keys():
+            raise ValueError("Invalid vertex!")
+        return Iterator(self, vertex)
 
     def copy_graph(self):
-        new_graph = Graph(self.__reversible, self.__weighted)
-        new_graph.__nodes = self.__nodes
-        new_graph.__graph = [row[:] for row in self.__graph]
-        return new_graph
-
-    def is_reversible(self):
-        return self.__reversible
-
-    def iter_vertex(self, start_vertex):
-        return GraphIterator(self, start_vertex)
-
-    def is_weighted(self):
-        return self.__weighted
+        # Complexity: O(n)
+        return deepcopy(self)
 
     @staticmethod
-    def create_from_file(file_name):
-        with open(file_name, "r") as file:
-            n, m, reversible, weighted = file.readline().strip().split()
-            n, m = int(n), int(m)
-            reversible = True if reversible == "T" else False
-            weighted = True if weighted == "T" else False
-
-            graph = Graph(reversible, weighted)
-
-            for _ in range(n):
-                graph.add_vertex()
-
-            for _ in range(m):
-                edge_data = file.readline().strip().split()
+    def read_graph(file):
+        with open(file, 'r') as f:
+            lines = f.readlines()
+            bits = lines[0].split()
+            if len(bits) != 4:
+                raise ValueError("Invalid input file!")
+            nr_of_nodes = int(bits[0])
+            nr_of_lines = int(bits[1])
+            weighted = False
+            directed = True
+            if bits[2] == 'F':
+                directed = False
+            elif bits[2] != 'T':
+                raise ValueError("Invalid input file!")
+            if bits[3] == 'T':
+                weighted = True
+            elif bits[3] != 'F':
+                raise ValueError("Invalid input file!")
+            g = Graph(directed=directed, weighted=weighted)
+            for i in range(nr_of_nodes):
+                g.add_vertex(i)
+            for i in range(1, nr_of_lines + 1):
+                if i >= len(lines):
+                    raise ValueError("Invalid input file!")
+                bits = lines[i].split()
+                g.add_edge(int(bits[0]), int(bits[1]))
                 if weighted:
-                    vertex1, vertex2, weight = int(edge_data[0]), int(edge_data[1]), int(edge_data[2])
-                    graph.add_edge(vertex1, vertex2, weight)
-                else:
-                    vertex1, vertex2 = int(edge_data[0]), int(edge_data[1])
-                    graph.add_edge(vertex1, vertex2)
-
-            return graph
+                    if len(bits) != 3:
+                        raise ValueError("Invalid input file!")
+                    g.set_weight(int(bits[0]), int(bits[1]), int(bits[2]))
+                    if not directed:
+                        g.set_weight(int(bits[1]), int(bits[0]), int(bits[2]))
+                elif len(bits) != 2:
+                    raise ValueError("Invalid input file!")
+                i += 1
+        return g
 
     def __str__(self):
-        graph_str = ""
-        for i in range(self.__nodes):
-            for j in range(self.__nodes):
-                if self.__graph[i][j] != 0:
-                    weight_str = f" Weight: {self.__graph[i][j]}" if self.__weighted else ""
-                    graph_str += f"Edge: {i} -> {j}{weight_str}\n"
-        return graph_str.strip()
-
-    def __repr__(self):
-        return self.__str__()
+        # Complexity: Theta(n+m)
+        s = f'Directed: {self.__directed}\nWeighted: {self.__weighted}\n'
+        s += "Vertices:\n"
+        for key in self._nodes.keys():
+            s = s + str(key) + " "
+        s += "\nEdges:"
+        if self.__directed:
+            for node in self._nodes:
+                for edge in self._nodes[node]:
+                    s += f'\n{node} {edge}'
+                    if self.__weighted:
+                        s += f' {self._weights[(node, edge)]}'
+        else:
+            edges = []
+            for node in self._nodes:
+                for edge in self._nodes[node]:
+                    if (edge, node) not in edges:
+                        edges.append((edge, node))
+                        edges.append((node, edge))
+                        s += f'\n{node} {edge}'
+                        if self.__weighted:
+                            s += f' {self._weights[(node, edge)]}'
+        return s
