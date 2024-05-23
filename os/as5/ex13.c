@@ -25,17 +25,16 @@ int product(int* arr, int size) {
     pipe(pipe_left);
     pipe(pipe_right);
 
-    pid_t pid_left = fork();
+    int pid_left = fork();
+
     if (pid_left == 0) {
-        close(pipe_left[0]);
         int left_product = product(left_arr, mid);
         write(pipe_left[1], &left_product, sizeof(left_product));
         close(pipe_left[1]);
         exit(0);
     } else {
-        pid_t pid_right = fork();
+        int pid_right = fork();
         if (pid_right == 0) {
-            close(pipe_right[0]);
             int right_product = product(right_arr, size - mid);
             write(pipe_right[1], &right_product, sizeof(right_product));
             close(pipe_right[1]);
@@ -51,8 +50,6 @@ int product(int* arr, int size) {
             read(pipe_left[0], &left_result, sizeof(left_result));
             read(pipe_right[0], &right_result, sizeof(right_result));
 
-            close(pipe_left[0]);
-            close(pipe_right[0]);
 
             return left_result * right_result;
         }
