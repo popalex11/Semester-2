@@ -1,37 +1,36 @@
+from directed_graph import *
 
-
-def regular_main_menu():
-    main_menu = ("\n0 - Create a new empty graph.\n"
-                 "1 - Add new vertex.\n"
-                 "2 - Add new edge.\n"
-                 "3 - Remove an edge.\n"
-                 "4 - Remove a vertex.\n"
-                 "5 - Create a random graph (deletes the already existing graph).\n"
-                 "6 - Get the number of vertices.\n"
-                 "7 - Get the number of edges.\n"
-                 "8 - Get the degree of a vertex.\n"
-                 "9 - Check if there is an edge between two vertices.\n"
-                 "10 - Get the outbound edges of a vertex.\n"
-                 "11 - Get the inbound edges of a vertex.\n"
-                 "12 - Copy the graph.\n"
-                 "13 - Print the graph.\n"
-                 "14 - Iterate through the graph via DFS.\n"
-                 "15 - Set the weight of an edge.\n"
-                 "16 - Give all edges random weights\n"
-                 "17 - Exit.\n"
+def menu():
+    main_menu = ("\n0. Create a new empty graph.\n"
+                 "1. Add new vertex.\n"
+                 "2. Add new edge.\n"
+                 "3. Remove an edge.\n"
+                 "4. Remove a vertex.\n"
+                 "5. Create a random graph (deletes the already existing graph).\n"
+                 "6. Get the number of vertices.\n"
+                 "7. Get the number of edges.\n"
+                 "8. Get the degree of a vertex.\n"
+                 "9. Check if there is an edge between two vertices.\n"
+                 "10. Get the outbound edges of a vertex.\n"
+                 "11. Get the inbound edges of a vertex.\n"
+                 "12. Copy the graph.\n"
+                 "13. Print the graph.\n"
+                 "14. Iterate through the graph via DFS.\n"
+                 "15. Set the weight of an edge.\n"
+                 "16. Give all edges random weights\n"
+                 "17. Exit.\n"
                  "Option: ")
     opt = -1
     try:
-        graph = graph.read_graph("graph_data.txt")
+        graph = Graph.read_graph("graph_data.txt")
         while opt != 17:
             try:
-
                 if opt != -1:
                     input()
                 opt = int(input(main_menu))
 
                 if opt == 0:
-                    graph = graph(graph.is_directed(), graph.is_weighted())
+                    graph = Graph(graph.is_directed(), graph.is_weighted())
 
                 elif opt == 1:
                     vertex = int(input("Vertex: "))
@@ -131,4 +130,4 @@ def regular_main_menu():
 
 
 if __name__ == '__main__':
-    regular_main_menu()
+    menu()
