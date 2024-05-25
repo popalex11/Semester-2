@@ -1,37 +1,32 @@
 #include "ListIterator.h"
 #include "SortedIndexedList.h"
 #include <iostream>
-#include <stdexcept>
 
 using namespace std;
 
 ListIterator::ListIterator(const SortedIndexedList& list) : list(list) {
-	//TODO - Implementation
-	
+    this->current = list.head;
 }
 
 void ListIterator::first(){
-	current = list.head;
+    this->current = list.head;
 }
 
 void ListIterator::next(){
-	if (valid ()) {
-		current = list.next[current];
-	}
+    if(!this->valid())
+        throw std::exception();
+    this->current = list.next[current];
 }
 
 bool ListIterator::valid() const{
-	if (current != -1) {
-		return true;
-	}
-	return false;
+    return this->current != -1;
 }
 
 TComp ListIterator::getCurrent() const{
-	if (!valid()) {
-		throw std::runtime_error("Invalid iterator position");
-	}
-	return list.elements[current];
+    if ( !this->valid() )
+        throw std::exception();
+    return list.elements[current];
 }
+
 
 

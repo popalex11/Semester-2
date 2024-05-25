@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <iostream>
+
 #include "ListIterator.h"
 #include "SortedIndexedList.h"
 
@@ -35,3 +35,22 @@ void testAll(){
     assert(list.isEmpty());
 }
 
+
+void testRemoveBetween() {
+    std::cout << "Test removeBetween" << std::endl;
+    SortedIndexedList list = SortedIndexedList(relation1);
+    list.add(1);
+    list.add(2);
+    list.add(3);
+    list.add(4);
+    list.add(5);
+    cout<<list.size()<<endl;
+    for(int i = 0; i < list.size(); i++) {
+        cout<<list.getElement(i)<<endl;
+    }
+    list.removeBetween(1, 3);
+    assert(2 == list.size());
+    assert(1 == list.getElement(0));
+    assert(5 == list.getElement(1));
+
+}

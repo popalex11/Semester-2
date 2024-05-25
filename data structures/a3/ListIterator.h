@@ -7,10 +7,8 @@ class ListIterator{
 	friend class SortedIndexedList;
 private:
 	const SortedIndexedList& list;
-	ListIterator(const SortedIndexedList& list);
-
-	//TODO - Representation
 	int current;
+    ListIterator(const SortedIndexedList& list);
 
 public:
 	void first();

@@ -6,21 +6,24 @@ class ListIterator;
 typedef int TComp;
 typedef bool (*Relation)(TComp, TComp);
 #define NULL_TCOMP -11111
+#define INITIAL_CAPACITY 10000
+#include<iostream>
 
 class SortedIndexedList {
 private:
 	friend class ListIterator;
 private:
-	Relation relation;
-	int capacity;
-	int size_list;
-	int head;
-	int* next;
-	TComp* elements;
+    TComp* elements;
+    int* next;
+    int capacity;
+    int head;
+    int firstEmpty;
+    int length;
+    Relation relation;
 
 public:
 	// constructor
-	SortedIndexedList(Relation r);
+    SortedIndexedList(Relation r);
 
 	// returns the size of the list
 	int size() const;
@@ -42,6 +45,9 @@ public:
 
 	// searches for an element and returns the first position where the element appears or -1 if the element is not in the list
 	int search(TComp e) const;
+
+    //removes all elements between the positions start and end
+    void removeBetween( int start, int end );
 
 	// returns an iterator set to the first element of the list or invalid if the list is empty
 	ListIterator iterator();
