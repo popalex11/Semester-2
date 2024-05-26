@@ -1,38 +1,55 @@
-
 #pragma once
 
-#define INITIAL_CAPACITY 10
+// DO NOT INCLUDE BAGITERATOR
 
+// DO NOT CHANGE THIS PART
+#define NULL_TELEM -111111
 typedef int TElem;
-
-struct Node {
-    TElem value;
-    int frequency;
-    bool valid;
-};
-
 class BagIterator;
 
 class Bag {
 private:
-    int size_of_bag;
+    TElem* elements; // Array for elements
+    int* frequencies; // Array for frequencies
+    int* next; // Array for chaining
+    int firstEmpty; // Index of the first empty slot
+    int capacity; // Capacity of the hashtable
+    int sizeOfBag; // Number of elements in the bag
+    int hash(TElem e) const; // Hash function
 
+    // Helper methods
+    int findPosition(TElem e) const;
     void resize();
-	int hashFunction(TElem elem, int capacity) const;
 
+    // DO NOT CHANGE THIS PART
+    friend class BagIterator;
 
 public:
-    int capacity;
-    Node* elements;
-
+    // constructor
     Bag();
-    void add(TElem elem);
-    bool remove(TElem elem);
-    bool search(TElem elem) const;
-    int nrOccurrences(TElem elem) const;
+
+    // adds an element to the bag
+    void add(TElem e);
+
+    // removes one occurrence of an element from a bag
+    // returns true if an element was removed, false otherwise (if e was not part of the bag)
+    bool remove(TElem e);
+
+    // checks if an element appears in the bag
+    bool search(TElem e) const;
+
+    // returns the number of occurrences for an element in the bag
+    int nrOccurrences(TElem e) const;
+
+    // returns the number of elements from the bag
     int size() const;
-    bool isEmpty() const;
+
+    // returns an iterator for this bag
     BagIterator iterator() const;
+
+    // checks if the bag is empty
+    bool isEmpty() const;
+
+    // destructor
     ~Bag();
 };
-

@@ -1,5 +1,3 @@
-// Bag.cpp
-
 #include "Bag.h"
 #include "BagIterator.h"
 #include <exception>
@@ -8,70 +6,86 @@
 using namespace std;
 
 Bag::Bag() {
-    capacity = INITIAL_CAPACITY;
-    elements = new Node[capacity];
-    size_of_bag = 0;
+    capacity = 10; // Initial capacity
+    elements = new TElem[capacity];
+    frequencies = new int[capacity];
+    next = new int[capacity];
+    firstEmpty = 0;
+    for (int i = 0; i < capacity; i++) {
+        elements[i] = NULL_TELEM;
+        frequencies[i] = 0;
+        next[i] = i + 1;
+    }
+    next[capacity - 1] = -1; // End of the empty positions list
+    sizeOfBag = 0;
 }
 
-void Bag::add(TElem elem) {
-    if (size_of_bag == capacity)
+int Bag::hash(TElem e) const {
+    return abs(e) % capacity;
+}
+
+void Bag::add(TElem e) {
+    if (sizeOfBag == capacity) {
         resize();
-    int index = hashFunction(elem, capacity);
-    while (elements[index].valid && elements[index].value != elem) {
-        index = (index + 1) % capacity;
     }
-    if (!elements[index].valid) {
-        elements[index].value = elem;
-        elements[index].frequency = 1;
-        elements[index].valid = true;
-        size_of_bag++;
+
+    int pos = findPosition(e);
+    if (pos != -1) {
+        frequencies[pos]++;
     } else {
-        elements[index].frequency++;
-    }
-}
-
-bool Bag::remove(TElem elem) {
-    int index = hashFunction(elem, capacity);
-    while (elements[index].valid && elements[index].value != elem) {
-        index = (index + 1) % capacity;
-    }
-    if (elements[index].valid && elements[index].value == elem) {
-        if (elements[index].frequency > 1) {
-            elements[index].frequency--;
+        int index = hash(e);
+        if (elements[index] == NULL_TELEM) {
+            elements[index] = e;
+            frequencies[index] = 1;
+            next[index] = -1;
         } else {
-            elements[index].valid = false;
-            size_of_bag--;
+            int current = index;
+            while (next[current] != -1) {
+                current = next[current];
+            }
+            int empty = firstEmpty;
+            firstEmpty = next[firstEmpty];
+            next[current] = empty;
+            elements[empty] = e;
+            frequencies[empty] = 1;
+            next[empty] = -1;
         }
-        return true;
+        sizeOfBag++;
     }
-    return false;
 }
 
-bool Bag::search(TElem elem) const {
-    int index = hashFunction(elem, capacity);
-    while (elements[index].valid && elements[index].value != elem) {
-        index = (index + 1) % capacity;
+bool Bag::remove(TElem e) {
+    int pos = findPosition(e);
+    if (pos == -1) {
+        return false;
     }
-    return elements[index].valid && elements[index].value == elem;
+
+    frequencies[pos]--;
+    if (frequencies[pos] == 0) {
+        elements[pos] = NULL_TELEM;
+        next[pos] = firstEmpty;
+        firstEmpty = pos;
+        sizeOfBag--;
+    }
+
+    return true;
 }
 
-int Bag::nrOccurrences(TElem elem) const {
-    int index = hashFunction(elem,capacity);
-    while (elements[index].valid && elements[index].value != elem) {
-        index = (index + 1) % capacity;
-    }
-    if (elements[index].valid && elements[index].value == elem) {
-        return elements[index].frequency;
-    }
-    return 0;
+bool Bag::search(TElem e) const {
+    return findPosition(e) != -1;
+}
+
+int Bag::nrOccurrences(TElem e) const {
+    int pos = findPosition(e);
+    return (pos == -1) ? 0 : frequencies[pos];
 }
 
 int Bag::size() const {
-    return size_of_bag;
+    return sizeOfBag;
 }
 
 bool Bag::isEmpty() const {
-    return size_of_bag == 0;
+    return sizeOfBag == 0;
 }
 
 BagIterator Bag::iterator() const {
@@ -80,27 +94,50 @@ BagIterator Bag::iterator() const {
 
 Bag::~Bag() {
     delete[] elements;
+    delete[] frequencies;
+    delete[] next;
+}
+
+int Bag::findPosition(TElem e) const {
+    int index = hash(e);
+    int current = index;
+    while (current != -1) {
+        if (elements[current] == e) {
+            return current;
+        }
+        current = next[current];
+    }
+    return -1;
 }
 
 void Bag::resize() {
-    int new_capacity = capacity * 2;
-    Node* new_elements = new Node[new_capacity];
+    int oldCapacity = capacity;
+    capacity *= 2;
+    TElem* oldElements = elements;
+    int* oldFrequencies = frequencies;
+    int* oldNext = next;
+
+    elements = new TElem[capacity];
+    frequencies = new int[capacity];
+    next = new int[capacity];
     for (int i = 0; i < capacity; i++) {
-        if (elements[i].valid) {
-            int index = hashFunction(elements[i].value, new_capacity); 
-            while (new_elements[index].valid) {
-                index = (index + 1) % new_capacity;
+        elements[i] = NULL_TELEM;
+        frequencies[i] = 0;
+        next[i] = i + 1;
+    }
+    next[capacity - 1] = -1;
+    firstEmpty = oldCapacity;
+    sizeOfBag = 0;
+
+    for (int i = 0; i < oldCapacity; i++) {
+        if (oldElements[i] != NULL_TELEM) {
+            for (int j = 0; j < oldFrequencies[i]; j++) {
+                add(oldElements[i]);
             }
-            new_elements[index] = elements[i];
         }
     }
-    delete[] elements;
-    elements = new_elements;
-    capacity = new_capacity;
+
+    delete[] oldElements;
+    delete[] oldFrequencies;
+    delete[] oldNext;
 }
-
-
-int Bag::hashFunction(TElem elem, int capacity) const {
-    return std::hash<TElem>{}(elem) % capacity;
-}
-

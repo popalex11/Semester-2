@@ -1,39 +1,37 @@
-
 #include "BagIterator.h"
 #include "Bag.h"
-#include <stdexcept>
+#include <exception>
 
-BagIterator::BagIterator(const Bag& c) : bag(c) {
-    current_position = 0;
-    while (current_position < bag.capacity && !bag.elements[current_position].valid) {
-        current_position++;
-    }
+using namespace std;
+
+BagIterator::BagIterator(const Bag& c) : bag(c), currentPos(0) {
+    first();
 }
 
 void BagIterator::first() {
-    current_position = 0;
-    while (current_position < bag.capacity && !bag.elements[current_position].valid) {
-        current_position++;
+    currentPos = 0;
+    while (currentPos < bag.capacity && bag.elements[currentPos] == NULL_TELEM) {
+        currentPos++;
     }
 }
 
 void BagIterator::next() {
     if (!valid()) {
-        throw std::runtime_error("Invalid iterator");
+        throw exception();
     }
-    current_position++;
-    while (current_position < bag.capacity && !bag.elements[current_position].valid) {
-        current_position++;
+    currentPos++;
+    while (currentPos < bag.capacity && bag.elements[currentPos] == NULL_TELEM) {
+        currentPos++;
     }
 }
 
 bool BagIterator::valid() const {
-    return current_position < bag.capacity;
+    return currentPos < bag.capacity && bag.elements[currentPos] != NULL_TELEM;
 }
 
 TElem BagIterator::getCurrent() const {
     if (!valid()) {
-        throw std::runtime_error("Invalid iterator");
+        throw exception();
     }
-    return bag.elements[current_position].value;
+    return bag.elements[currentPos];
 }

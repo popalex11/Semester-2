@@ -1,17 +1,17 @@
-
-#pragma once
-
 #include "Bag.h"
 
 class BagIterator {
+    friend class Bag;
+
 private:
     const Bag& bag;
-    int current_position;
+    int currentPos;
+
+    BagIterator(const Bag& c);
 
 public:
-    BagIterator(const Bag& c);
     void first();
     void next();
-    TElem getCurrent() const;
     bool valid() const;
+    TElem getCurrent() const;
 };
