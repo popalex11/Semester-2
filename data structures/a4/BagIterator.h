@@ -1,17 +1,21 @@
 #include "Bag.h"
 
-class BagIterator {
-    friend class Bag;
-
+class BagIterator
+{
+	//DO NOT CHANGE THIS PART
+	friend class Bag;
+	
 private:
-    const Bag& bag;
-    int currentPos;
+	const Bag& bag;
+	//TODO  - Representation
+    int currentElement;
+    int currentFreq;
+    void move();
 
-    BagIterator(const Bag& c);
-
+	BagIterator(const Bag& c);
 public:
-    void first();
-    void next();
-    bool valid() const;
-    TElem getCurrent() const;
+	void first();
+	void next();
+	TElem getCurrent() const;
+	bool valid() const;
 };

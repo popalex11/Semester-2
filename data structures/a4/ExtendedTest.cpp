@@ -45,10 +45,12 @@ void testAdd() {
 	}
 	assert(b.isEmpty() == false);
 	assert(b.size() == 10);
-	for (int i = -10; i < 20; i++) { 
+
+    for (int i = -10; i < 20; i++) {
 		b.add(i);
 	}
-	assert(b.isEmpty() == false);
+
+    assert(b.isEmpty() == false);
 	assert(b.size() == 40);
 	for (int i = -100; i < 100; i++) {
 		b.add(i);
@@ -101,11 +103,10 @@ void testRemove() {
 		assert(b.remove(i) == false);
 	}
 	assert(b.size() == 0);
-	for (int i = -100; i < 100; i = i + 2) { 
+	for (int i = -100; i < 100; i = i + 2) {
 		b.add(i);
 	}
 	for (int i = -100; i < 100; i++) {
-
 		if (i % 2 == 0) {
 			assert(b.remove(i) == true);
 		}
@@ -113,6 +114,7 @@ void testRemove() {
 			assert(b.remove(i) == false);
 		}
 	}
+
 	testIteratorSteps(b);
 	assert(b.size() == 0);
 	for (int i = -100; i <= 100; i = i + 2) { 
@@ -126,8 +128,10 @@ void testRemove() {
 			assert(b.remove(i) == false);
 		}
 	}
-	testIteratorSteps(b);
-	assert(b.size() == 1);
+
+    testIteratorSteps(b);
+
+    assert(b.size() == 1);
 	b.remove(-100);
 	for (int i = -100; i < 100; i++) { 
 		b.add(i);
@@ -345,19 +349,44 @@ void testQuantity() {
 		it.next();
 	}
 	it.first();
-	while (it.valid()) { 
+	while (it.valid()) {
 		TElem e = it.getCurrent();
 		assert(b.search(e) == true);
 		assert(b.nrOccurrences(e) > 0);
 		it.next();
 	}
+
 	assert(it.valid() == false);
-	for (int i = 0; i < 10; i++) { 
+
+	for (int i = 0; i < 10; i++) {
 		for (int j = 40000; j >= -40000; j--) {
 			b.remove(j);
 		}
 	}
+
 	assert(b.size() == 0);
+}
+
+void testAddOccurrences() {
+    cout << "Test AddOccurrences" << endl;
+    Bag b;
+    for (int i = 0; i < 10; i++) {
+        b.add(i);
+    }
+
+    for (int i = -10; i < 20; i++) {
+        b.add(i);
+    }
+
+    b.addOccurrences(5, 0);
+    assert(b.nrOccurrences(0) == 7);
+
+    try {
+        b.addOccurrences(-1, 0);
+        assert(false);
+    } catch (exception&) {
+        assert(true);
+    }
 }
 
 
@@ -366,6 +395,7 @@ void testAllExtended() {
 	testAdd();
 	testRemove();
 	testIterator();
+    testAddOccurrences();
 	testQuantity();
 
 

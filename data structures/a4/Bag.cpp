@@ -5,139 +5,234 @@
 
 using namespace std;
 
+int hashCode(TElem e) {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    return abs(e);
+}
+
+int Bag::h(TElem e) const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    return hashCode(e) % m;
+}
+
+int Bag::hashFunction(TElem e, int i) const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    return (int) ((float) h(e) + c1 * (float) i + c2 * (float) i * (float) i) % m;
+}
+
 Bag::Bag() {
-    capacity = 10; // Initial capacity
-    elements = new TElem[capacity];
-    frequencies = new int[capacity];
-    next = new int[capacity];
-    firstEmpty = 0;
-    for (int i = 0; i < capacity; i++) {
-        elements[i] = NULL_TELEM;
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(m)
+     * Average case: O(m)
+     */
+    //TODO - Implementation
+    m = MAX;
+    cont = 0;
+    c1 = 0.5;
+    c2 = 0.5;
+    elems = new TElem[m];
+    frequencies = new int[m];
+    for (int i = 0; i < m; i++) {
+        elems[i] = NULL_TELEM;
         frequencies[i] = 0;
-        next[i] = i + 1;
-    }
-    next[capacity - 1] = -1; // End of the empty positions list
-    sizeOfBag = 0;
-}
-
-int Bag::hash(TElem e) const {
-    return abs(e) % capacity;
-}
-
-void Bag::add(TElem e) {
-    if (sizeOfBag == capacity) {
-        resize();
-    }
-
-    int pos = findPosition(e);
-    if (pos != -1) {
-        frequencies[pos]++;
-    } else {
-        int index = hash(e);
-        if (elements[index] == NULL_TELEM) {
-            elements[index] = e;
-            frequencies[index] = 1;
-            next[index] = -1;
-        } else {
-            int current = index;
-            while (next[current] != -1) {
-                current = next[current];
-            }
-            int empty = firstEmpty;
-            firstEmpty = next[firstEmpty];
-            next[current] = empty;
-            elements[empty] = e;
-            frequencies[empty] = 1;
-            next[empty] = -1;
-        }
-        sizeOfBag++;
     }
 }
 
-bool Bag::remove(TElem e) {
-    int pos = findPosition(e);
-    if (pos == -1) {
-        return false;
-    }
-
-    frequencies[pos]--;
-    if (frequencies[pos] == 0) {
-        elements[pos] = NULL_TELEM;
-        next[pos] = firstEmpty;
-        firstEmpty = pos;
-        sizeOfBag--;
-    }
-
-    return true;
-}
-
-bool Bag::search(TElem e) const {
-    return findPosition(e) != -1;
-}
-
-int Bag::nrOccurrences(TElem e) const {
-    int pos = findPosition(e);
-    return (pos == -1) ? 0 : frequencies[pos];
-}
-
-int Bag::size() const {
-    return sizeOfBag;
-}
-
-bool Bag::isEmpty() const {
-    return sizeOfBag == 0;
-}
-
-BagIterator Bag::iterator() const {
-    return BagIterator(*this);
-}
-
-Bag::~Bag() {
-    delete[] elements;
-    delete[] frequencies;
-    delete[] next;
-}
-
-int Bag::findPosition(TElem e) const {
-    int index = hash(e);
-    int current = index;
-    while (current != -1) {
-        if (elements[current] == e) {
-            return current;
-        }
-        current = next[current];
+int Bag::findPosition(TElem e) {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(m)
+     * Average case: O(m)
+     */
+    int i = 0;
+    while (i < m) {
+        int pos = hashFunction(e, i);
+        if (elems[pos] == e || elems[pos] == NULL_TELEM || elems[pos] == DELETED)
+            return pos;
+        i++;
     }
     return -1;
 }
 
 void Bag::resize() {
-    int oldCapacity = capacity;
-    capacity *= 2;
-    TElem* oldElements = elements;
-    int* oldFrequencies = frequencies;
-    int* oldNext = next;
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    TElem *newElems = new TElem[2 * m];
+    int *newFreq = new int[2 * m];
 
-    elements = new TElem[capacity];
-    frequencies = new int[capacity];
-    next = new int[capacity];
-    for (int i = 0; i < capacity; i++) {
-        elements[i] = NULL_TELEM;
-        frequencies[i] = 0;
-        next[i] = i + 1;
+    for (int i = 0; i < 2 * m; i++) {
+        newElems[i] = NULL_TELEM;
+        newFreq[i] = 0;
     }
-    next[capacity - 1] = -1;
-    firstEmpty = oldCapacity;
-    sizeOfBag = 0;
 
-    for (int i = 0; i < oldCapacity; i++) {
-        if (oldElements[i] != NULL_TELEM) {
-            for (int j = 0; j < oldFrequencies[i]; j++) {
-                add(oldElements[i]);
-            }
+    m = 2 * m;
+
+    for (int j = 0; j < m / 2; j++) {
+        if (elems[j] != NULL_TELEM) {
+            int i = 0;
+            int position;
+            do {
+                position = hashFunction(elems[j], i);
+                i++;
+            } while (newElems[position] != NULL_TELEM);
+            newElems[position] = elems[j];
+            newFreq[position] = frequencies[j];
         }
     }
 
-    delete[] oldElements;
-    delete[] oldFrequencies;
-    delete[] oldNext;
+    delete[] elems;
+    delete[] frequencies;
+    elems = newElems;
+    frequencies = newFreq;
 }
+
+void Bag::add(TElem elem) {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    //TODO - Implementation
+    if (cont / m >= 0.7)
+        resize();
+    int position = findPosition(elem);
+    if (elems[position] == elem)
+        frequencies[position]++;
+    else {
+        elems[position] = elem;
+        frequencies[position] = 1;
+    }
+    cont++;
+}
+
+
+bool Bag::remove(TElem elem) {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    //TODO - Implementation
+    int i = 0;
+    while (i < m) {
+        int pos = hashFunction(elem, i);
+        if (elems[pos] == elem) {
+            frequencies[pos]--;
+            if (frequencies[pos] == 0)
+                elems[pos] = DELETED;
+            cont--;
+            return true;
+        }
+        i++;
+    }
+    return false;
+}
+
+
+bool Bag::search(TElem elem) const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    //TODO - Implementation
+    int i = 0;
+    while (i < m && elems[hashFunction(elem, i)] != NULL_TELEM) {
+        int pos = hashFunction(elem, i);
+        if (elems[pos] == elem)
+            return true;
+        i++;
+    }
+    return false;
+}
+
+int Bag::nrOccurrences(TElem elem) const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    //TODO - Implementation
+    int i = 0;
+    while (i < m) {
+        int pos = hashFunction(elem, i);
+        if (elems[pos] == elem)
+            return frequencies[pos];
+        i++;
+    }
+    return 0;
+}
+
+int Bag::size() const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    //TODO - Implementation
+    return cont;
+}
+
+
+bool Bag::isEmpty() const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    //TODO - Implementation
+    return cont == 0;
+}
+
+BagIterator Bag::iterator() const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    return BagIterator(*this);
+}
+
+void Bag::addOccurrences(int nr, TElem elem) {
+    if (nr < 0)
+        throw std::exception();
+    if (!search(elem))
+        throw std::exception();
+    int i = 0;
+    int pos = hashFunction(elem, i);
+    while (i < m && elems[pos] != NULL_TELEM){
+        if (elems[pos] == elem) {
+            frequencies[pos] += nr;
+            break;
+        }
+        i ++;
+    }
+}
+
+Bag::~Bag() {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    //TODO - Implementation
+    delete[] elems;
+    delete[] frequencies;
+}
+

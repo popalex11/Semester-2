@@ -1,37 +1,82 @@
+#include <exception>
 #include "BagIterator.h"
 #include "Bag.h"
-#include <exception>
 
 using namespace std;
 
-BagIterator::BagIterator(const Bag& c) : bag(c), currentPos(0) {
-    first();
+void BagIterator::move() {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    while (currentElement < bag.m && (bag.elems[currentElement] == NULL_TELEM || bag.elems[currentElement] == DELETED))
+        currentElement++;
+}
+
+BagIterator::BagIterator(const Bag &c) : bag(c) {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    //TODO - Implementation
+    currentElement = 0;
+    move();
+    currentFreq = 1;
 }
 
 void BagIterator::first() {
-    currentPos = 0;
-    while (currentPos < bag.capacity && bag.elements[currentPos] == NULL_TELEM) {
-        currentPos++;
-    }
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    //TODO - Implementation
+    currentElement = 0;
+    move();
+    currentFreq = 1;
 }
+
 
 void BagIterator::next() {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(n)
+     * Average case: O(n)
+     */
+    //TODO - Implementation
     if (!valid()) {
-        throw exception();
+        throw std::exception();
     }
-    currentPos++;
-    while (currentPos < bag.capacity && bag.elements[currentPos] == NULL_TELEM) {
-        currentPos++;
-    }
+    if (currentFreq + 1 > bag.frequencies[currentElement]) {
+        currentElement ++;
+        move();
+        currentFreq = 1;
+    } else currentFreq++;
 }
+
 
 bool BagIterator::valid() const {
-    return currentPos < bag.capacity && bag.elements[currentPos] != NULL_TELEM;
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    //TODO - Implementation
+    return (currentElement < bag.m && currentFreq <= bag.frequencies[currentElement]);
 }
 
+
 TElem BagIterator::getCurrent() const {
+    /*
+     * Best case: theta(1)
+     * Worst case: theta(1)
+     * Average case: theta(1)
+     */
+    //TODO - Implementation
     if (!valid()) {
-        throw exception();
+        throw std::exception();
     }
-    return bag.elements[currentPos];
+    return bag.elems[currentElement];
 }
