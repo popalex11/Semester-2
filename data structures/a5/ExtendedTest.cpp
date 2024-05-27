@@ -6,6 +6,9 @@
 #include "SMMIterator.h"
 #include "SortedMultiMap.h"
 #include "ExtendedTest.h"
+#include "ValueIterator.h"
+#include "testUtils.h"
+
 
 using namespace std;
 
@@ -244,6 +247,24 @@ void testIterator(Relation r) {
 	}
 }
 
+
+void testValueIterator() {
+    cout << "Test ValueIterator" << endl;
+    SortedMultiMap smm(relation1);
+    smm.add(1, 2);
+    smm.add(1, 3);
+    smm.add(2, 4);
+
+    ValueIterator it = smm.iteratorForKey(1);
+    it.first();
+    while (it.valid()) {
+        cout << it.getCurrent() << " ";
+        it.next();
+    }
+    cout << endl;
+    // Expected output: 2 3
+}
+
 void testIterator() {
 	testIterator(asc);
 	testIterator(desc);
@@ -255,4 +276,5 @@ void testAllExtended() {
 	testRemove();
 	testIterator();
 	testRelations();
+	testValueIterator();
 }

@@ -1,5 +1,6 @@
 #include "SMMIterator.h"
 #include "SortedMultiMap.h"
+#include "ValueIterator.h"
 #include <iostream>
 #include <vector>
 #include <exception>
@@ -153,4 +154,8 @@ SortedMultiMap::~SortedMultiMap() {
     delete[] this->elements;
     delete[] this->left;
     delete[] this->right;
+}
+
+ValueIterator SortedMultiMap::iteratorForKey(TKey k) const {
+    return ValueIterator(*this, k);
 }

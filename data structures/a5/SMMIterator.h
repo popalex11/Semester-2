@@ -16,5 +16,5 @@ public:
     void next();
     bool valid() const;
     TElem getCurrent() const;
-    ~SMMIterator(); // Declare the destructor
+    ~SMMIterator(); 
 };

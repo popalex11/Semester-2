@@ -4,17 +4,10 @@
 #include "SMMIterator.h"
 #include <exception>
 #include <vector>
+#include "testUtils.h"
 
 using namespace std;
 
-bool relation1(TKey cheie1, TKey cheie2) {
-	if (cheie1 <= cheie2) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
 
 void testAll(){
 	SortedMultiMap smm = SortedMultiMap(relation1);
