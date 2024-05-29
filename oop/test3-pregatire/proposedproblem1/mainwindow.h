@@ -2,10 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTableWidget>
+#include <QListWidget>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QLabel>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
@@ -13,9 +15,23 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+
+private slots:
+    void addSong();
+    void deleteSong();
+    void updateSong();
+    void filterSongs();
+    void addToPlaylist();
+    void playSong();
+    void nextSong();
 
 private:
-    Ui::MainWindow *ui;
+    void initializeSongTable();
+    QTableWidget *songTable;
+    QListWidget *playlistWidget;
+    QLineEdit *titleInput;
+    QLineEdit *artistInput;
+    QLineEdit *durationInput;
+    QLineEdit *pathInput;
 };
 #endif // MAINWINDOW_H
