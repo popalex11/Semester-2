@@ -308,44 +308,95 @@ class Graph:
         else:
             return "The graph does not have an Eulerian circuit or path"
 
-
     def get_eulerian_circuit(self):
-        # Get the Eulerian circuit using Hierholzer's algorithm
-        if not self.is_eulerian():
+        # Check if the graph has an Eulerian circuit
+        if self.is_eulerian() != "Eulerian circuit":
             raise ValueError("Graph is not Eulerian")
-        # Get the minimum spanning tree using Kruskal's algorithm
-        minimum_spanning_tree = self.kruskal()
+        
+        # Create a copy of the graph to work with
+        g = deepcopy(self)
+        
+        # Start from any vertex with edges
+        current_vertex = next(iter(g._nodes))
+        circuit = []
+        stack = [current_vertex]
+        
+        while stack:
+            if g._nodes[current_vertex]:
+                stack.append(current_vertex)
+                next_vertex = g._nodes[current_vertex].pop()
+                if not self.__directed:
+                    g._nodes[next_vertex].remove(current_vertex)
+                current_vertex = next_vertex
+            else:
+                circuit.append(current_vertex)
+                current_vertex = stack.pop()
+        
+        return circuit[::-1]
 
-        # Create an adjacency list representation of the tree
-        tree = {}
-        for vertex1, vertex2, weight in minimum_spanning_tree:
-            if vertex1 not in tree:
-                tree[vertex1] = []
-            tree[vertex1].append(vertex2)
-            if vertex2 not in tree:
-                tree[vertex2] = []
-            tree[vertex2].append(vertex1)
 
-        # Perform depth-first search (DFS) to find the Eulerian circuit
-        path = []
-        visited = set()
+    # def get_eulerian_circuit(self):
+    #     # Get the Eulerian circuit using Hierholzer's algorithm
+    #     if not self.is_eulerian():
+    #         raise ValueError("Graph is not Eulerian")
+    #     # Get the minimum spanning tree using Kruskal's algorithm
+    #     minimum_spanning_tree = self.kruskal()
 
-        def dfs(node):
-            nonlocal path
-            visited.add(node)
-            path.append(node)
-            for neighbor in tree[node]:
-                if neighbor not in visited:
-                    dfs(neighbor)
-            if len(path) > 0:
-                path.pop()
+    #     # Create an adjacency list representation of the tree
+    #     tree = {}
+    #     for vertex1, vertex2, weight in minimum_spanning_tree:
+    #         if vertex1 not in tree:
+    #             tree[vertex1] = []
+    #         tree[vertex1].append(vertex2)
+    #         if vertex2 not in tree:
+    #             tree[vertex2] = []
+    #         tree[vertex2].append(vertex1)
 
-        # Start DFS from an arbitrary node in the tree
-        start_node = next(iter(tree.keys()))
-        dfs(start_node)
+    #     # Perform depth-first search (DFS) to find the Eulerian circuit
+    #     path = []
+    #     visited = set()
 
-        return path
+    #     def dfs(node):
+    #         nonlocal path
+    #         visited.add(node)
+    #         path.append(node)
+    #         for neighbor in tree[node]:
+    #             if neighbor not in visited:
+    #                 dfs(neighbor)
+    #         if len(path) > 0:
+    #             path.pop()
+
+    #     # Start DFS from an arbitrary node in the tree
+    #     start_node = next(iter(tree.keys()))
+    #     dfs(start_node)
+
+    #     return path
     
+    def independent_sets(self, k):
+        # Complexity: O(nk)
+        def is_independent_set(set):
+            for i in range(len(set)):
+                for j in range(i + 1, len(set)):
+                    if self.is_edge(set[i], set[j]):
+                        return False
+            return True
+
+        def backtrack(start, current_set):
+            if len(current_set) == k:
+                independent_sets.append(current_set[:])
+                return
+            #for should go from start to the length of the graph
+            for i in range(start, len(vertices)):
+                current_set.append(vertices[i])
+                if is_independent_set(current_set):
+                    backtrack(i + 1, current_set)
+                current_set.pop()
+
+        vertices  = list(self._nodes.keys())
+        independent_sets = []
+        backtrack(0, [])
+        return independent_sets                
+
 
     def __repr__(self):
         return str(self)

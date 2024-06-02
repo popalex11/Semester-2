@@ -41,10 +41,15 @@ def regular_main_menu():
                              "3. Go back to the main menu. \n"
                              "Option: ")
 
+    main_menu_assignment6 = ("\n1. Find all independent sets of size k (using backtracking). \n"
+                             "2. Go back to the main menu. \n"
+                             "Option: ")
+    
     menu = ("1. Assignment 2 options.\n"
             "2. Assignment 4 options. \n"
             "3. Assignment 5 options. \n"
-            "4. Exit. \n"
+            "4. Assignment 6 options. \n"
+            "5. Exit. \n"
             "Option: ")
 
     option = -1
@@ -52,7 +57,7 @@ def regular_main_menu():
     try:
         graph = Graph.read_graph("graph_data.txt")
         
-        while option != 4:
+        while option != 5:
             try: 
 
                 if option != -1:
@@ -205,6 +210,24 @@ def regular_main_menu():
                             print(f'Error: {e}')
                 
                 elif option == 4:
+                    opt = -1
+                    while opt != 2:
+                        try:
+                            if opt != -1:
+                                input()
+                            opt = int(input(Color.CYAN + main_menu_assignment6))
+                            if opt == 1:
+                                k = int(input("k: "))
+                                print(Color.MAGENTA + str(graph.independent_sets(k)))
+                            elif opt == 2:
+                                print("Exiting.")
+
+                            else:
+                                raise ValueError("Invalid command! \n")
+                        except Exception as e:
+                            print(f'Error: {e}')
+
+                elif option == 5:
                     print("Exiting.")
 
 
@@ -221,19 +244,24 @@ def regular_main_menu():
 if __name__ == '__main__':
     regular_main_menu()
 
-
-# 8 14 F F
-# 0 5
-# 0 7
-# 1 6
-# 1 4
-# 1 7
+# Standard Graph
+# 7 10 F F
+# 0 1
+# 0 2
 # 1 0
-# 3 6
+# 1 3
+# 2 0
+# 2 5
 # 3 1
-# 5 3
-# 5 1
-# 6 2
-# 6 7
-# 7 5
-# 7 3
+# 3 4
+# 4 3
+# 4 6
+# 5 2
+# 6 4
+
+# To check Eulerian 
+# 4 4 F F
+# 0 1
+# 1 2
+# 2 3
+# 3 0
