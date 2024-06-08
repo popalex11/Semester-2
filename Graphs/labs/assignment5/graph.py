@@ -331,8 +331,8 @@ class Graph:
             else:
                 circuit.append(current_vertex)
                 current_vertex = stack.pop()
-        
-        return circuit[::-1]
+        #return circuit[::-1]
+        return circuit
 
 
     # def get_eulerian_circuit(self):
