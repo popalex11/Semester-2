@@ -1,26 +1,24 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
-class B {
-public:
-    void f() { std::cout << "B.f "; }
-    virtual ~B() {}
-};
+using namespace std;
 
-class D1 : public B {
-public:
-    virtual void f() { std::cout << "D1.f "; }
-    virtual ~D1() {}
-};
+int main()
+{
+    vector<int> v{ 1, 2, 3, 4, 5 };
+    vector<int>::iterator it = std::find(v.begin(), v.end(), 4);
+    v.insert(it, 7);
+    it = v.begin() + 2;
+    *it = 11;
+    vector<int> x;
+    std::copy_if(v.begin(), v.end(), back_inserter(x), [](int a) { return a % 2 == 1; });
 
-class D2 : public D1 {
-public:
-    void f() { std::cout << "D2.f "; }
-};
+    for (auto i : x)
+        cout << i << " ";
 
-int main() {
-    B* b1 = new B();  b1->f(); delete b1;
-    B* b2 = new D1(); b2->f(); delete b2;
-    B* b3 = new D2(); b3->f(); delete b3;
-    D1* d = new D2(); d->f();  delete d;
     return 0;
 }
+
+// 123745 12 11 745 1 11 7 5
